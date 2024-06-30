@@ -73,3 +73,18 @@ a {
     right: 10px;
     cursor: pointer;
 }
+
+
+/*style galerie*/
+
+#photo-container .photo-div  {
+    width: 564px;
+    height:495px;/*voir le ratio calcul pour calcucler la largeur pour faire du 4/3*/
+    overflow: hidden;
+}
+
+#photo-container .photo-div img{
+    object-fit: cover;
+    width: 100%;
+    height: inherit;  
+}
