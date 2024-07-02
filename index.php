@@ -9,6 +9,7 @@ get_header(); // Inclut le fichier header.php
     <p>Voici le contenu principal de la page d'accueil.</p>
     <div id="photo-container"></div>
     <button id="load-more-button">Charger plus</button>
+    
 </main>
 
 <?php
