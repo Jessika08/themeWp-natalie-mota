@@ -10,9 +10,6 @@ function mon_theme_enqueue_scripts() {
     // Enqueue le fichier modal.js
     wp_enqueue_script( 'modal-script', get_template_directory_uri() . '/js/modal.js', array(), '1.0', true );
 
-    // Enqueue le fichier singlePicture.js
-    wp_enqueue_script( 'singlePicture-script', get_template_directory_uri() . '/js/singlePicture.js', array(), '1.0', true );
-
     //Enqueue le fichier motaphoto.js
     wp_enqueue_script( 'motaphoto-script', get_template_directory_uri() . '/js/motaphoto.js', array(), '1.0', true );
 
@@ -26,10 +23,10 @@ function mon_theme_enqueue_scripts() {
 add_action( 'wp_enqueue_scripts', 'mon_theme_enqueue_scripts' );
 
 //AJOUT DE FONTAWESOME
-//function enqueue_fontawesome() {
- //   wp_enqueue_style( 'fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css' );
-//}
-//add_action( 'wp_enqueue_scripts', 'enqueue_fontawesome' );
+function enqueue_fontawesome() {
+    wp_enqueue_style( 'fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css' );
+}
+add_action( 'wp_enqueue_scripts', 'enqueue_fontawesome' );
 
 
 //fonction pour ajouter mes typos
