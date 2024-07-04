@@ -77,23 +77,91 @@ a {
 
 /*style galerie*/
 
+/* Styles pour la galerie */
 #photo-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px; /* Ajustez l'espacement entre les images selon vos besoins */
-    width: 100%; /* Assurez que le conteneur occupe toute la largeur */
-    max-width: 1128px; /* Ajustez selon vos besoins */
-    margin: 0 auto; /* Centre le conteneur sur la page */
+    gap: 16px; /* espacement entre les images */
+    width: 100%;
+    max-width: 1128px;
+    margin: 0 auto;
+}
+
+#photo-container .photo-div {
+    position: relative;
 }
 
 #photo-container .photo-div a {
     width: 564px;
-    height:495px;/*voir le ratio calcul pour calcucler la largeur pour faire du 4/3*/
+    height: 495px; /* voir le ratio calcul pour calculer la largeur pour faire du 4/3 */
     overflow: hidden;
 }
 
-#photo-container .photo-div img{
+#photo-container .photo-div img {
     object-fit: cover;
     width: 100%;
-    height: inherit;  
+    height: inherit;
 }
+
+#photo-container .hover-photo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#photo-container .photo-div:hover .hover-photo {
+    opacity: 1;
+}
+
+
+
+#photo-container .hover-photo .icon-fullscreen-container,
+#photo-container .hover-photo .icon-eye-container {
+    position: absolute;
+    color: white;
+    font-size: 24px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+#photo-container .hover-photo .icon-fullscreen-container {
+    top: 10px;
+    right: 10px;
+    font-size: 25px;
+    background-color: rgba(0, 0, 0, 0.7); /* Fond noir opaque */
+    padding: 12px 15px; /* Ajouter un peu d'espace autour de l'icône */
+    border-radius: 30px; /* Optionnel : ajouter des coins arrondis */
+    cursor: pointer;
+}
+
+#photo-container .hover-photo .icon-eye-container {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 45px;
+}
+
+#photo-container .hover-photo .info-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: white;
+}
+
+#photo-container .hover-photo .photo-title,
+#photo-container .hover-photo .photo-category {
+    margin: 0;
+    padding: 2px 5px;
+}
+
+
+/*style page infos photo ( single photo)*/

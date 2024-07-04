@@ -74,7 +74,7 @@ function motaphoto_request_picture()  {
             $query->the_post();
             $posts[] = [
                 'title' => get_the_title(),
-                'slug' => get_post_field('post_name', get_the_ID()), // Assurez-vous d'ajouter le slug ici
+                'slug' => get_post_field('post_name', get_the_ID()), 
                 'featured_image' => get_the_post_thumbnail_url(get_the_ID(), 'full')
             ];
         }
