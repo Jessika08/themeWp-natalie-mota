@@ -55,7 +55,19 @@ function add_open_modal_class_to_contact_menu_item($classes, $item, $args) {
 }
 add_filter('nav_menu_css_class', 'add_open_modal_class_to_contact_menu_item', 10, 3);
 
-
+// Enregistrement de la taxonomie personnalisée 'categorie' pour le type de publication 'picture'
+function register_custom_taxonomy() {
+    register_taxonomy(
+        'categorie',  // Nom de la taxonomie (doit correspondre au slug de la taxonomie créée avec CPT UI)
+        'picture',    // Nom du type de publication personnalisé associé
+        array(
+            'label' => __( 'Catégories' ),
+            'rewrite' => array( 'slug' => 'photo-category' ), // Slug de la taxonomie
+            'hierarchical' => true,  // Taxonomie hiérarchique comme les catégories normales de WordPress
+        )
+    );
+}
+add_action( 'init', 'register_custom_taxonomy' );
 
 /*********Fonction pour afficher les photos **********/ 
 function motaphoto_request_picture()  {
@@ -72,10 +84,21 @@ function motaphoto_request_picture()  {
     if ($query->have_posts()) {
         while ($query->have_posts()) {
             $query->the_post();
+
+            // Récupération des catégories associées à la photo                 NOUVEAUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU à tester
+            $categories = get_the_terms(get_the_ID(), 'categorie'); // Ajouté
+            $category_names = $categories ? wp_list_pluck($categories, 'name') : ['Unknown Category']; // Correction
+           // $category_names = $categories ? $categories[0]->name : 'Unknown Category';  Ajouté
+
+             // Récupérer les champs ACF
+             $reference = get_field('reference', get_the_ID()); 
+
             $posts[] = [
                 'title' => get_the_title(),
                 'slug' => get_post_field('post_name', get_the_ID()), 
-                'featured_image' => get_the_post_thumbnail_url(get_the_ID(), 'full')
+                'featured_image' => get_the_post_thumbnail_url(get_the_ID(), 'full'),
+                'category' => join(', ', $category_names), // Corrected
+                'reference' => $reference // Ajouter la référence à la réponse JSON
             ];
         }
         wp_reset_postdata();
