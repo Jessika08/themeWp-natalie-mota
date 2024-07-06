@@ -70,35 +70,47 @@ function register_custom_taxonomy() {
 add_action( 'init', 'register_custom_taxonomy' );
 
 /*********Fonction pour afficher les photos **********/ 
-function motaphoto_request_picture()  {
-
+function motaphoto_request_picture() {
     $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
+    $category = isset($_GET['category']) ? sanitize_text_field($_GET['category']) : 'all'; // Récupère la catégorie sélectionnée
 
-    $query = new WP_Query([
-        'post_type' => 'picture',// Utilisation de 'picture' comme slug du type de publication personnalisé
-        'posts_per_page' => 8, // Nombre de photos par page
-        'offset' => $offset // Offset pour charger plus de photos
-    ]);
+    $args = array(
+        'post_type' => 'picture',
+        'posts_per_page' => 8,
+        'offset' => $offset,
+    );
+
+    // Ajouter le filtre par catégorie si ce n'est pas "all"
+    if ($category !== 'all') {
+        $args['tax_query'] = array(
+            array(
+                'taxonomy' => 'categorie',
+                'field' => 'slug',
+                'terms' => $category,
+            ),
+        );
+    }
+
+    $query = new WP_Query($args);
 
     $posts = [];
     if ($query->have_posts()) {
         while ($query->have_posts()) {
             $query->the_post();
 
-            // Récupération des catégories associées à la photo                 NOUVEAUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU à tester
-            $categories = get_the_terms(get_the_ID(), 'categorie'); // Ajouté
-            $category_names = $categories ? wp_list_pluck($categories, 'name') : ['Unknown Category']; // Correction
-           // $category_names = $categories ? $categories[0]->name : 'Unknown Category';  Ajouté
+            // Récupération des catégories associées à la photo
+            $categories = get_the_terms(get_the_ID(), 'categorie');
+            $category_names = $categories ? wp_list_pluck($categories, 'name') : ['Unknown Category'];
 
-             // Récupérer les champs ACF
-             $reference = get_field('reference', get_the_ID()); 
+            // Récupération des champs ACF
+            $reference = get_field('reference', get_the_ID());
 
             $posts[] = [
                 'title' => get_the_title(),
-                'slug' => get_post_field('post_name', get_the_ID()), 
+                'slug' => get_post_field('post_name', get_the_ID()),
                 'featured_image' => get_the_post_thumbnail_url(get_the_ID(), 'full'),
-                'category' => join(', ', $category_names), // Corrected
-                'reference' => $reference // Ajouter la référence à la réponse JSON
+                'category' => join(', ', $category_names),
+                'reference' => $reference,
             ];
         }
         wp_reset_postdata();
@@ -109,6 +121,7 @@ function motaphoto_request_picture()  {
 
     wp_die();
 }
+
 
 add_action('wp_ajax_request_picture', 'motaphoto_request_picture');
 add_action('wp_ajax_nopriv_request_picture', 'motaphoto_request_picture');
@@ -188,4 +201,33 @@ function motaphoto_request_single_picture() {
 // Enregistre les actions AJAX pour les utilisateurs connectés et non connectés
 add_action('wp_ajax_request_single_picture', 'motaphoto_request_single_picture');
 add_action('wp_ajax_nopriv_request_single_picture', 'motaphoto_request_single_picture');
+
+
+// Ajouter une action pour gérer la requête AJAX
+add_action('wp_ajax_load_categories', 'load_categories_callback');
+add_action('wp_ajax_nopriv_load_categories', 'load_categories_callback'); // Si l'utilisateur n'est pas connecté
+
+function load_categories_callback() {
+    $categories = get_terms(array(
+        'taxonomy' => 'categorie', // Remplace 'categorie' par le nom de ta taxonomie
+        'hide_empty' => true, // Cacher les catégories sans articles
+    ));
+
+    $response = array();
+    foreach ($categories as $category) {
+        $response[] = array(
+            'slug' => $category->slug,
+            'name' => $category->name,
+        );
+    }
+
+    wp_send_json($response);
+}
+
+//mots clé de recherche:  wordpress chargement ajax taxionomie/acf
+//pour l'affichage:je créer mes 3 champs en html , ensuite je les rempli dynamiquement comme pour les catégories le formats mais pour la date je l'écrit directement dans le html
+//ordre ascendant ou descendant ajax
+//ensuite je recupere la valeur de ses champs quand je les modifie ( par defaut tous) faire un console.log pour verifier que les categories ou formats sont bien récupérées
+//je rempli mes critère par mes mots clés
 ?>
+
