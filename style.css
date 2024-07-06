@@ -163,6 +163,23 @@ a {
     padding: 2px 5px;
 }
 
+/*style bouton "Charger plus galerie"*/
+.load-more-div{
+    display: flex;
+    justify-content: center;
+}
+
+#load-more-button{
+    cursor: pointer;
+    font-size: 12px;
+    font-family: SpaceMono;
+    font-weight: 400;
+    background-color: #D8D8D8;
+    border: unset;
+    width: 270px;
+    height: 50px;
+}
+
 
 /*style page infos photo ( single photo)*/
 

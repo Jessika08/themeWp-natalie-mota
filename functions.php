@@ -5,7 +5,7 @@ function mon_theme_enqueue_scripts() {
     wp_enqueue_style( 'mon-theme-style', get_template_directory_uri() . '/style.css' );
 
     // Enqueue le fichier JS principal
-   // wp_enqueue_script( 'mon-theme-script', get_template_directory_uri() . '/js/main.js', array('jquery'), '1.0', true );
+    // wp_enqueue_script( 'mon-theme-script', get_template_directory_uri() . '/js/main.js', array('jquery'), '1.0', true );
 
     // Enqueue le fichier modal.js
     wp_enqueue_script( 'modal-script', get_template_directory_uri() . '/js/modal.js', array(), '1.0', true );
@@ -18,7 +18,6 @@ function mon_theme_enqueue_scripts() {
         'ajax_url' => admin_url( 'admin-ajax.php' ),
         'site_url' => get_site_url() // Ajout de site_url ici
     ));
-
 }
 add_action( 'wp_enqueue_scripts', 'mon_theme_enqueue_scripts' );
 
@@ -28,13 +27,11 @@ function enqueue_fontawesome() {
 }
 add_action( 'wp_enqueue_scripts', 'enqueue_fontawesome' );
 
-
 //fonction pour ajouter mes typos
 function enqueue_custom_fonts() {
     // Enqueue le fichier CSS contenant les déclarations @font-face
     wp_enqueue_style('custom-fonts', get_template_directory_uri() . '/fonts/custom-fonts.css');
 }
-
 add_action('wp_enqueue_scripts', 'enqueue_custom_fonts');
 
 //Fonction pour ajouter le menu
@@ -66,6 +63,17 @@ function register_custom_taxonomy() {
             'hierarchical' => true,  // Taxonomie hiérarchique comme les catégories normales de WordPress
         )
     );
+
+    // Enregistrement de la taxonomie personnalisée 'format' pour le type de publication 'picture'
+    register_taxonomy(
+        'format',  // Nom de la taxonomie
+        'picture', // Nom du type de publication personnalisé associé
+        array(
+            'label' => __( 'Formats' ),
+            'rewrite' => array( 'slug' => 'photo-format' ), // Slug de la taxonomie
+            'hierarchical' => false,  // Taxonomie non hiérarchique comme les tags
+        )
+    );
 }
 add_action( 'init', 'register_custom_taxonomy' );
 
@@ -73,6 +81,7 @@ add_action( 'init', 'register_custom_taxonomy' );
 function motaphoto_request_picture() {
     $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
     $category = isset($_GET['category']) ? sanitize_text_field($_GET['category']) : 'all'; // Récupère la catégorie sélectionnée
+    $format = isset($_GET['format']) ? sanitize_text_field($_GET['format']) : 'all'; // Récupère le format sélectionné
 
     $args = array(
         'post_type' => 'picture',
@@ -82,12 +91,19 @@ function motaphoto_request_picture() {
 
     // Ajouter le filtre par catégorie si ce n'est pas "all"
     if ($category !== 'all') {
-        $args['tax_query'] = array(
-            array(
-                'taxonomy' => 'categorie',
-                'field' => 'slug',
-                'terms' => $category,
-            ),
+        $args['tax_query'][] = array(
+            'taxonomy' => 'categorie',
+            'field' => 'slug',
+            'terms' => $category,
+        );
+    }
+
+    // Ajouter le filtre par format si ce n'est pas "all"
+    if ($format !== 'all') {
+        $args['tax_query'][] = array(
+            'taxonomy' => 'format',
+            'field' => 'slug',
+            'terms' => $format,
         );
     }
 
@@ -102,6 +118,10 @@ function motaphoto_request_picture() {
             $categories = get_the_terms(get_the_ID(), 'categorie');
             $category_names = $categories ? wp_list_pluck($categories, 'name') : ['Unknown Category'];
 
+            // Récupération des formats associés à la photo
+            $formats = get_the_terms(get_the_ID(), 'format');
+            $format_names = $formats ? wp_list_pluck($formats, 'name') : ['Unknown Format'];
+
             // Récupération des champs ACF
             $reference = get_field('reference', get_the_ID());
 
@@ -110,6 +130,7 @@ function motaphoto_request_picture() {
                 'slug' => get_post_field('post_name', get_the_ID()),
                 'featured_image' => get_the_post_thumbnail_url(get_the_ID(), 'full'),
                 'category' => join(', ', $category_names),
+                'format' => join(', ', $format_names),
                 'reference' => $reference,
             ];
         }
@@ -121,7 +142,6 @@ function motaphoto_request_picture() {
 
     wp_die();
 }
-
 
 add_action('wp_ajax_request_picture', 'motaphoto_request_picture');
 add_action('wp_ajax_nopriv_request_picture', 'motaphoto_request_picture');
@@ -186,8 +206,8 @@ function motaphoto_request_single_picture() {
         $html = '<h1>' . esc_html($post->post_title) . '</h1>';
         $html .= '<img src="' . get_the_post_thumbnail_url($post_id, 'full') . '" alt="' . esc_attr($post->post_title) . '">';
         $html .= '<p>' . esc_html($post->post_content) . '</p>';
-        $html .= '<p><strong>Format :</strong> ' . esc_html($format_list) . '</p>';
         $html .= '<p><strong>Catégorie :</strong> ' . esc_html($category_list) . '</p>';
+        $html .= '<p><strong>Format :</strong> ' . esc_html($format_list) . '</p>';
         $html .= '<p><strong>Référence :</strong> ' . esc_html($reference) . '</p>';
         $html .= '<p><strong>Type :</strong> ' . esc_html($type) . '</p>';
         $html .= '<p><strong>Année :</strong> ' . esc_html($year) . '</p>';
@@ -202,11 +222,7 @@ function motaphoto_request_single_picture() {
 add_action('wp_ajax_request_single_picture', 'motaphoto_request_single_picture');
 add_action('wp_ajax_nopriv_request_single_picture', 'motaphoto_request_single_picture');
 
-
-// Ajouter une action pour gérer la requête AJAX
-add_action('wp_ajax_load_categories', 'load_categories_callback');
-add_action('wp_ajax_nopriv_load_categories', 'load_categories_callback'); // Si l'utilisateur n'est pas connecté
-
+// Ajouter une action pour gérer la requête AJAX des catégories
 function load_categories_callback() {
     $categories = get_terms(array(
         'taxonomy' => 'categorie', // Remplace 'categorie' par le nom de ta taxonomie
@@ -223,11 +239,78 @@ function load_categories_callback() {
 
     wp_send_json($response);
 }
+add_action('wp_ajax_load_categories', 'load_categories_callback');
+add_action('wp_ajax_nopriv_load_categories', 'load_categories_callback'); // Si l'utilisateur n'est pas connecté
 
-//mots clé de recherche:  wordpress chargement ajax taxionomie/acf
-//pour l'affichage:je créer mes 3 champs en html , ensuite je les rempli dynamiquement comme pour les catégories le formats mais pour la date je l'écrit directement dans le html
-//ordre ascendant ou descendant ajax
-//ensuite je recupere la valeur de ses champs quand je les modifie ( par defaut tous) faire un console.log pour verifier que les categories ou formats sont bien récupérées
-//je rempli mes critère par mes mots clés
+// Ajouter une action pour gérer la requête AJAX des formats
+function load_formats_callback() {
+    $formats = get_terms(array(
+        'taxonomy' => 'format', // Remplace 'format' par le nom de ta taxonomie
+        'hide_empty' => true, // Cacher les formats sans articles
+    ));
+
+    $response = array();
+    foreach ($formats as $format) {
+        $response[] = array(
+            'slug' => $format->slug,
+            'name' => $format->name,
+        );
+    }
+
+    wp_send_json($response);
+}
+add_action('wp_ajax_load_formats', 'load_formats_callback');
+add_action('wp_ajax_nopriv_load_formats', 'load_formats_callback');
+
+// Ajouter une action pour gérer la requête AJAX des photos
+function request_picture_callback() {
+    $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
+    $category = isset($_GET['category']) ? sanitize_text_field($_GET['category']) : 'all';
+    $format = isset($_GET['format']) ? sanitize_text_field($_GET['format']) : 'all';
+    $per_page = 8; // Nombre de photos à charger à chaque fois
+
+    $args = array(
+        'post_type' => 'picture', // Correction de 'photo' à 'picture'
+        'posts_per_page' => $per_page,
+        'offset' => $offset,
+    );
+
+    if ($category !== 'all') {
+        $args['tax_query'][] = array(
+            'taxonomy' => 'categorie',
+            'field'    => 'slug',
+            'terms'    => $category,
+        );
+    }
+
+    if ($format !== 'all') {
+        $args['tax_query'][] = array(
+            'taxonomy' => 'format',
+            'field'    => 'slug',
+            'terms'    => $format,
+        );
+    }
+
+    $query = new WP_Query($args);
+
+    $posts = array();
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $posts[] = array(
+                'title'         => get_the_title(),
+                'slug'          => get_post_field('post_name', get_post()),
+                'featured_image'=> get_the_post_thumbnail_url(),
+                'category'      => wp_get_post_terms(get_the_ID(), 'categorie', array("fields" => "names"))[0],
+                'format'        => wp_get_post_terms(get_the_ID(), 'format', array("fields" => "names"))[0],
+                'reference'     => get_post_meta(get_the_ID(), 'reference', true), // Assuming you have a custom field 'reference'
+            );
+        }
+        wp_reset_postdata();
+    }
+
+    wp_send_json(array('posts' => $posts));
+}
+add_action('wp_ajax_request_picture', 'request_picture_callback');
+add_action('wp_ajax_nopriv_request_picture', 'request_picture_callback'); // Si l'utilisateur n'est pas connecté
 ?>
-

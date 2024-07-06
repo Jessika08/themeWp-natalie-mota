@@ -14,9 +14,16 @@ get_header(); // Inclut le fichier header.php
         <!-- Les options seront ajoutées dynamiquement via JavaScript -->
     </select>
 
+    <label for="format-filter">Filtrer par Format :</label>
+    <select id="format-filter">
+        <option value="all">Tout les formats</option>
+        <!-- Les options seront ajoutées dynamiquement via JavaScript -->
+    </select>
+
     <div id="photo-container"></div>
+    <div class="load-more-div">
     <button id="load-more-button">Charger plus</button>
-    
+    </div>
 </main>
 
 <?php
