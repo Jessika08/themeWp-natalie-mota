@@ -1,7 +1,7 @@
 # Ignorer tous les fichiers et répertoires
-*
+#*
 
 # À l'exception des fichiers du thème WordPress
-!.gitignore
+#!.gitignore
 
 # Ajoutez d'autres extensions de fichiers du thème si nécessaire
