@@ -8,7 +8,11 @@ Version: 1.0
 Tags: photographe,portofolio photographe, artiste 
 Text Domain: Nathalie Mota - Photographe
 */
-
+/*Style général*/
+body{
+    margin-left: unset;
+    margin-right: unset;
+}
 /**********Header &Footer  style**********/
 header {
     display: flex;
@@ -33,6 +37,11 @@ header {
     list-style: none;
 }
 
+footer {
+    height: 30px;
+    padding-top: 12px;
+    border-top: 1px solid black;
+}
 .footer-content {
     display: flex;
     justify-content: center;
@@ -56,15 +65,18 @@ a {
 /**style modale*/
 
 #myModal {
+    width: 600px;
+    height: 770px;
     display: none; /* Par défaut, masquez la modale */
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: white;
-    border: 1px solid #ccc;
+    border: 5px solid black;
     padding: 20px;
     z-index: 1000;
+    overflow: hidden;
 }
 
 .close-button {
@@ -74,8 +86,96 @@ a {
     cursor: pointer;
 }
 
+.wpcf7-form {
+    width: 270px;
+    margin-top: 40px;
+}
 
-/*style galerie*/
+.text-line{
+    font-size: 60px;
+    font-family: SpaceMono;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    height: 55px;
+}
+
+.text-line2{
+    transform: translateX(-16%);
+}
+
+.modal-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-content input {
+    width: 263px;
+    height: 40px;
+    border-radius: 10px;
+    border: #B8BBC2 1px solid;
+}
+
+.modal-content textarea{
+    width: 263px;
+    height: 210px;
+    border-radius: 10px;
+    border: #B8BBC2 1px solid;
+}
+
+.modal-content  p label {
+    font-family: Poppins;
+    color: #313144;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+#send_message{
+    font-family: SpaceMono;
+    border-radius: unset;
+    border: unset;
+    height: 50px;
+    cursor: pointer;
+}
+
+#send_message:hover{
+    background-color: #000000;
+    color: white;
+}
+
+/*style héro */
+.hero-background{
+    width: 100%;
+}
+/*Style pour les filtres*/
+
+#category-filter, #format-filter, #date-filter{
+    border-color: #B8BBC2;
+    border-radius: 6px;
+    width: 260px;
+    height: 42px;
+    padding: 11px 18px;
+    font-family: Poppins;
+    font-size: 12px;
+    font-weight: 500;
+    color: #313144;
+    text-transform: uppercase;
+}
+
+.all-filters{
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.filter-container{
+    display: flex;
+    width: 1128px;
+    justify-content: space-between;
+}
+
 
 /* Styles pour la galerie */
 #photo-container {
@@ -155,6 +255,16 @@ a {
     bottom: 10px;
     left: 10px;
     color: white;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.info-container .photo-title{
+    font-family: Poppins;
+}
+
+.info-container .photo-category{
+    font-family: SpaceMono;
 }
 
 #photo-container .hover-photo .photo-title,
@@ -167,9 +277,12 @@ a {
 .load-more-div{
     display: flex;
     justify-content: center;
+    margin: 20px 0px;
 }
 
 #load-more-button{
+    margin-top: 20px;
+    margin-bottom: 20px;
     cursor: pointer;
     font-size: 12px;
     font-family: SpaceMono;
@@ -180,8 +293,129 @@ a {
     height: 50px;
 }
 
+#load-more-button:hover{
+    background-color: #000000;
+    color: white;
+}
 
 /*style page infos photo ( single photo)*/
+
+
+.photo-details{
+    display: flex;
+    height: 800px;
+    margin: 0 10vh;
+}
+
+.left-bloc{
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    border-bottom: 1px black solid;
+    
+}
+
+h1{
+    font-family: SpaceMono;
+    font-size: 66px;
+    font-style: italic;
+    font-weight: 400;
+    margin: unset;
+    width: 445px;
+    text-transform: uppercase;
+}
+
+.left-bloc p {
+    text-transform: uppercase;
+    font-family: SpaceMono;
+    font-weight: 400;
+    font-size: 14px;
+
+}
+.unset{
+    display: none;
+}
+
+.right-bloc{
+    width: 50vw;
+    display: flex;
+    justify-content: center;
+}
+
+.right-bloc img{
+    object-fit: contain;
+    width: 100%;
+    
+}
+
+.navigation-wrapper{
+    margin: 5px 255px 0 95px;
+    display: flex;
+    justify-content: space-between;
+    height: 118px;
+    border-bottom: 1px solid black;
+}
+
+.contact-single{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contact-single p {
+    font-family: Poppins;
+    margin-right: 20px;
+   
+}
+
+.contact-single #contact-button{
+    font-family: SpaceMono;
+    width: 272px;
+    height: 50px;
+    border: unset;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+#contact-button:hover{
+    background-color: #000000;
+    color: white;
+}
+
+.thumbnail{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.arrows{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.prev, .next {
+    margin: 6px 12px 0 12px;
+}
+
+.related-photos p {
+    text-transform: uppercase;
+    font-weight: 400;
+    font-family: SpaceMono;
+}
+
+
+.photo-div img {
+    object-fit: cover;
+    width: 100%;
+    height: inherit;
+}
+
+.photo-div  {
+    position: relative;
+    width: 564px;
+    height: 495px; /* voir le ratio calcul pour calculer la largeur pour faire du 4/3 */
+    overflow: hidden;
+}
 
 /*style lightbox*/
 .custom-lightbox {
@@ -213,15 +447,15 @@ a {
 }
 
 .prev-button, .next-button {
+    font-family: SpaceMono;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 24px;
+    font-size: 18px;
     cursor: pointer;
     color: white;
     padding: 10px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
+   
 }
 
 .prev-button {
@@ -240,6 +474,146 @@ a {
     color: white;
 }
 
+.info-container p:first-child {
+    /* Styles pour le premier paragraphe */
+    font-family: Poppins;
+}
+
+.info-container p:last-child {
+    /* Styles pour le deuxième paragraphe */
+    font-family: SpaceMono;
+}
+
+
 body.noscroll {
     overflow: hidden;
 }
+
+
+/*********************************************************************************************************************************************************************/
+/*STYLE MENU BURGER*/
+
+/* Styles for the menu burger icon */
+.menu-burger {
+    display: none;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+/* Styles for the modal */
+/* Styles for the modal */
+.menu-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #E00000;
+    z-index: 9999;
+    transform: translateX(100vw);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+}
+
+.menu-modal.active {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.menu-modal-content .menu-menu-principal-container ul {
+    list-style: none;
+    text-decoration: none;
+    font-family: 'SpaceMono';
+    font-size: 44px;
+    
+}
+.menu-modal-content .menu-menu-principal-container ul li{
+    margin-bottom: 20px;
+}
+
+.menu-modal-content .menu-menu-principal-container ul li a {
+    color: white;
+    text-transform: uppercase;
+    
+}
+
+.menu-modal-content {
+    color: white;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+/* Media Query for screens less than 1200px */
+
+@media (max-width: 1200px) {
+   
+    
+ #photo-container{
+    grid-template-columns: repeat(1, 1fr);
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+  } 
+
+}
+
+/* Media Query for screens less than 992px */
+@media (max-width: 992px){
+    .prev-button{
+    top: 97%;
+}
+
+.filter-container{
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.tax{
+    display: flex;
+    flex-direction: column;
+}
+
+.photo-details{
+   align-items: center; 
+   flex-direction: column-reverse;
+   height: auto;
+}
+
+
+}
+
+/* Media Query for screens less than 768px */
+@media (max-width: 768px) {
+    .menu-burger {
+        display: block;
+    }
+    .menu-principal-container > nav {
+        display: none;
+    }
+
+  .filter-container{
+    flex-direction: column;
+  }
+
+ .photo-div{
+        width: 318px;
+        height: 279px;  
+    }
+
+  .footer-links{
+    display: flex;
+    flex-direction: column;
+  }
+
+  body.no-scroll {
+    overflow: hidden;
+}
+
+
+}
+

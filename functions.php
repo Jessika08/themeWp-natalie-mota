@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 // Fonction pour enregistrer et enqueuer les styles et scripts
 function mon_theme_enqueue_scripts() {
     // Enqueue le fichier CSS principal
@@ -10,8 +11,14 @@ function mon_theme_enqueue_scripts() {
     // Enqueue le fichier modal.js
     wp_enqueue_script( 'modal-script', get_template_directory_uri() . '/js/modal.js', array(), '1.0', true );
 
-    //Enqueue le fichier motaphoto.js
+    // Enqueue le fichier motaphoto.js
     wp_enqueue_script( 'motaphoto-script', get_template_directory_uri() . '/js/motaphoto.js', array(), '1.0', true );
+
+    // Enqueue FontAwesome
+    wp_enqueue_style( 'fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css' );
+
+    // Enqueue les typos personnalisées
+    wp_enqueue_style('custom-fonts', get_template_directory_uri() . '/fonts/custom-fonts.css');
 
     // wp_localize_script est une fonction WordPress utilisée pour rendre les variables JavaScript accessibles dans les scripts front-end.
     wp_localize_script( 'motaphoto-script', 'motaphoto_js', array(
@@ -21,20 +28,7 @@ function mon_theme_enqueue_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'mon_theme_enqueue_scripts' );
 
-//AJOUT DE FONTAWESOME
-function enqueue_fontawesome() {
-    wp_enqueue_style( 'fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css' );
-}
-add_action( 'wp_enqueue_scripts', 'enqueue_fontawesome' );
-
-//fonction pour ajouter mes typos
-function enqueue_custom_fonts() {
-    // Enqueue le fichier CSS contenant les déclarations @font-face
-    wp_enqueue_style('custom-fonts', get_template_directory_uri() . '/fonts/custom-fonts.css');
-}
-add_action('wp_enqueue_scripts', 'enqueue_custom_fonts');
-
-//Fonction pour ajouter le menu
+// Enregistrement du menu principal
 function enregistrer_menus() {
     register_nav_menus(
         array(
@@ -44,6 +38,7 @@ function enregistrer_menus() {
 }
 add_action( 'init', 'enregistrer_menus' );
 
+// Ajout de la classe 'open-modal' au lien de menu 'Contact'
 function add_open_modal_class_to_contact_menu_item($classes, $item, $args) {
     if ($args->theme_location == 'principal' && $item->title == 'Contact') {
         $classes[] = 'open-modal';
@@ -77,7 +72,7 @@ function register_custom_taxonomy() {
 }
 add_action( 'init', 'register_custom_taxonomy' );
 
-/*********Fonction pour afficher les photos **********/ 
+/********* Fonction pour afficher les photos **********/
 function motaphoto_request_picture() {
     $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
     $category = isset($_GET['category']) ? sanitize_text_field($_GET['category']) : 'all'; // Récupère la catégorie sélectionnée
@@ -106,6 +101,18 @@ function motaphoto_request_picture() {
             'terms' => $format,
         );
     }
+
+    // Ajout de l'ordre de tri par titre ou date
+    $orderby = isset($_GET['orderby']) ? $_GET['orderby'] : 'date';
+    $order = isset($_GET['order']) ? $_GET['order'] : 'DESC';
+
+    if ($orderby === 'title') {
+        $args['orderby'] = 'title';
+    } else {
+        $args['orderby'] = 'date';
+    }
+
+    $args['order'] = strtoupper($order); // Convertit en majuscules pour DESC ou ASC
 
     $query = new WP_Query($args);
 
@@ -142,11 +149,10 @@ function motaphoto_request_picture() {
 
     wp_die();
 }
-
 add_action('wp_ajax_request_picture', 'motaphoto_request_picture');
 add_action('wp_ajax_nopriv_request_picture', 'motaphoto_request_picture');
 
-//enregistrement du template de la page d'infos des photos
+// Enregistrement du template de la page d'infos des photos
 add_filter('template_include', 'custom_single_picture_template');
 
 function custom_single_picture_template($template) {
@@ -158,6 +164,7 @@ function custom_single_picture_template($template) {
     }
     return $template;
 }
+
 // Fonction pour créer le type de publication personnalisé 'picture'
 function create_picture_post_type() {
     register_post_type('picture',
@@ -175,52 +182,49 @@ function create_picture_post_type() {
 }
 add_action('init', 'create_picture_post_type');
 
-/***********Fonction pour la Page d'infos d'une photo **********/
+/*********** Fonction pour la Page d'infos d'une photo **********/
 
 // Fonction pour gérer la requête AJAX et récupérer les informations de la photo
 function motaphoto_request_single_picture() {
     // Récupère l'ID du post depuis la requête AJAX
-    $post_id = intval($_GET['post_id']);
-    // Récupère le post à partir de l'ID
-    $post = get_post($post_id);
+    $post_id = isset($_GET['post_id']) ? intval($_GET['post_id']) : 0;
 
-    if ($post) {
-        // Récupération des formats associés à la photo
-        $formats = get_the_terms($post_id, 'format');
-        $format_list = $formats ? join(', ', wp_list_pluck($formats, 'name')) : 'Aucun format';
+    if ($post_id > 0) {
+        // Récupère les informations de la photo
+        $title = get_the_title($post_id);
+        $content = apply_filters('the_content', get_post_field('post_content', $post_id));
+        $image = get_the_post_thumbnail_url($post_id, 'full');
 
-        // Récupération des catégories associées à la photo
+        // Récupère les catégories de la photo
         $categories = get_the_terms($post_id, 'categorie');
-        $category_list = $categories ? join(', ', wp_list_pluck($categories, 'name')) : 'Aucune catégorie';
+        $category_names = $categories ? wp_list_pluck($categories, 'name') : ['Unknown Category'];
 
-        // Récupération de la référence de la photo (champ personnalisé)
-        $reference = get_post_meta($post_id, 'reference', true);
+        // Récupère les formats de la photo
+        $formats = get_the_terms($post_id, 'format');
+        $format_names = $formats ? wp_list_pluck($formats, 'name') : ['Unknown Format'];
 
-        // Récupération du type de photo (champ personnalisé)
-        $type = get_post_meta($post_id, 'type', true);
+        // Récupère le champ ACF 'reference' de la photo
+        $reference = get_field('reference', $post_id);
 
-        // Récupération de l'année de publication de la photo
-        $year = get_the_date('Y', $post_id);
+        // Construit le tableau de données à renvoyer
+        $data = [
+            'title' => $title,
+            'content' => $content,
+            'image' => $image,
+            'categories' => join(', ', $category_names),
+            'formats' => join(', ', $format_names),
+            'reference' => $reference,
+        ];
 
-        // Contenu HTML à retourner
-        $html = '<h1>' . esc_html($post->post_title) . '</h1>';
-        $html .= '<img src="' . get_the_post_thumbnail_url($post_id, 'full') . '" alt="' . esc_attr($post->post_title) . '">';
-        $html .= '<p>' . esc_html($post->post_content) . '</p>';
-        $html .= '<p><strong>Catégorie :</strong> ' . esc_html($category_list) . '</p>';
-        $html .= '<p><strong>Format :</strong> ' . esc_html($format_list) . '</p>';
-        $html .= '<p><strong>Référence :</strong> ' . esc_html($reference) . '</p>';
-        $html .= '<p><strong>Type :</strong> ' . esc_html($type) . '</p>';
-        $html .= '<p><strong>Année :</strong> ' . esc_html($year) . '</p>';
-
-        echo $html;
+        wp_send_json($data);
+    } else {
+        wp_send_json(false);
     }
 
-    wp_die(); // Termine l'exécution du script proprement
+    wp_die();
 }
-
-// Enregistre les actions AJAX pour les utilisateurs connectés et non connectés
-add_action('wp_ajax_request_single_picture', 'motaphoto_request_single_picture');
-add_action('wp_ajax_nopriv_request_single_picture', 'motaphoto_request_single_picture');
+add_action('wp_ajax_single_picture_info', 'motaphoto_request_single_picture');
+add_action('wp_ajax_nopriv_single_picture_info', 'motaphoto_request_single_picture');
 
 // Ajouter une action pour gérer la requête AJAX des catégories
 function load_categories_callback() {
@@ -313,4 +317,5 @@ function request_picture_callback() {
 }
 add_action('wp_ajax_request_picture', 'request_picture_callback');
 add_action('wp_ajax_nopriv_request_picture', 'request_picture_callback'); // Si l'utilisateur n'est pas connecté
+
 ?>
