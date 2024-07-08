@@ -7,7 +7,8 @@ get_header(); // Inclut le fichier header.php
 <main>
     
 <div class="hero">
-    <img class="hero-background" src="<?php echo esc_url( 'http://nathalie-mota-photographe.local/wp-content/uploads/2024/07/hero-img-title-1.png' ); ?>" alt="Image de fond du héros">
+    <img class="hero-background" src="<?php echo esc_url($_SERVER['HTTP_HOST'].'/wp-content/uploads/2024/07/hero-img-title-1.png' ); ?>" alt="Image de fond du héros">
+
 </div>
 
 <div class="all-filters">

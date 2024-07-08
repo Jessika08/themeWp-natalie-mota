@@ -3,7 +3,5 @@
 
 # À l'exception des fichiers du thème WordPress
 !.gitignore
-!*.php
-!style.css
-!*.js
+
 # Ajoutez d'autres extensions de fichiers du thème si nécessaire

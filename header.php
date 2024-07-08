@@ -29,11 +29,21 @@
 
     <!-- Menu Modal -->
     <div class="menu-modal">
-        <div class="menu-modal-content">
+         <div class="header-menu-burger">
+            <div class="logo-burger">
+         <a href="<?php echo esc_url( home_url( '/' ) ); ?>">
+                <img src="<?php echo get_template_directory_uri(); ?>/assets/images/logo-nathalie.png" alt="<?php bloginfo( 'name' ); ?>">
+            </a>
+        </div>
             <!-- Close Icon -->
             <div class="close-modal">
                 <i class="fas fa-times"></i>
             </div>
+            </div>
+        <div class="menu-modal-content">
+
+           
+
             <?php wp_nav_menu( array( 'theme_location' => 'principal' ) ); ?>
         </div>
     </div>
